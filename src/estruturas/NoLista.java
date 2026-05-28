@@ -1,3 +1,5 @@
+package estruturas;
+
 public class NoLista {
 
     class No {

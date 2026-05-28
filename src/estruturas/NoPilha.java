@@ -1,3 +1,5 @@
+package estruturas;
+
 public class NoPilha {
 
     class No {
