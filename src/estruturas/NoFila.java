@@ -2,9 +2,9 @@ package estruturas;
 
 public class NoFila {
 
-    class No {
-        String id;
-        int tamanho;
+    public class No {
+        public String id;
+        public int tamanho;
         No proximo;
 
         public No(String id, int tamanho) {
