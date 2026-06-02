@@ -4,7 +4,8 @@ import estruturas.NoFila;
 import estruturas.NoLista;
 import estruturas.NoPilha;
 
-public class Alocador {
+public class
+Alocador {
     private NoArvore raiz;
 
     private NoFila filaPendentes;
@@ -204,5 +205,13 @@ public class Alocador {
             indice++;
         }
         return indice;
+    }
+
+    public NoLista[] getListasLivres() {
+        return listasLivres;
+    }
+
+    public NoFila getFilaPendentes() {
+        return filaPendentes;
     }
 }
