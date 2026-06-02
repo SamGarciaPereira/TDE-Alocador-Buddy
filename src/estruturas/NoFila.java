@@ -59,4 +59,29 @@ public class NoFila {
     public int tamanho() {
         return qtd;
     }
+
+    public void imprimirFila() {
+
+        No atual = inicio;
+
+        System.out.println("\n===== FILA =====");
+
+        if (atual == null) {
+            System.out.println("Fila vazia");
+        }
+
+        while (atual != null) {
+
+            System.out.println(
+                    atual.id +
+                            " - " +
+                            atual.tamanho +
+                            "KB"
+            );
+
+            atual = atual.proximo;
+        }
+
+        System.out.println("================\n");
+    }
 }
