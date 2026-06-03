@@ -117,12 +117,15 @@ Alocador {
             return false;
         }
 
+        //salva tamanho antes de liberar
+        int tamanhoBloco = noParaLiberar.getTamanho();
+
         // libera o bloco
         noParaLiberar.setEstado(NoArvore.Estado.LIVRE);
         noParaLiberar.setId(null);
 
         // empilha historico de liberacao
-        pilhaHistorico.empilhar("LIBERAR:" + idProcesso);
+        pilhaHistorico.empilhar("LIBERAR:" + idProcesso + ":" + tamanhoBloco);
 
         // inicia a verificação de fusão subindo a arvore
         realizarMerge(noParaLiberar);
@@ -205,6 +208,78 @@ Alocador {
             indice++;
         }
         return indice;
+    }
+
+    public boolean desfazer() {
+        // impede erro ao tentar reverter o estado se o historico estiver vazio
+        if (pilhaHistorico.estaVazia()) {
+            return false;
+        }
+
+        // extrai a ultima acao e quebra a string para recuperar os dados
+        String operacao = (String) pilhaHistorico.desempilhar();
+        String[] partes = operacao.split(":");
+        String comando = partes[0];
+        String idProcesso = partes[1];
+
+        // a logica central do desfazer e aplicar a operacao oposta
+        if (comando.equals("ALOCAR")) {
+            System.out.println("Revertendo alocação: liberando " + idProcesso);
+            // se a ultima acao foi alocar, libera o bloco sem gerar historico extra
+            return liberarSilencioso(idProcesso);
+
+        } else if (comando.equals("LIBERAR")) {
+            int tamanho = Integer.parseInt(partes[2]);
+            System.out.println("Revertendo liberação: alocando " + idProcesso + " (" + tamanho + "KB)");
+            // se a ultima acao foi liberar, aloca restaurando o tamanho original
+            return alocarSilencioso(idProcesso, tamanho);
+        }
+
+        return false;
+    }
+
+    // executa a alocacao e gerencia a fila de pendentes sem registrar na pilha.
+    // usado pelo desfazer e pela fila para reverter ou atualizar o estado
+    // sem criar logs indesejados e poluir o historico de operacoes.
+    private boolean alocarSilencioso(String idProcesso, int tamanhoSolicitado) {
+        int tamanhoNecessario = calcularProximaPotencia(tamanhoSolicitado);
+        boolean sucesso = realizarSplit(raiz, tamanhoNecessario, idProcesso);
+
+        // mantem a logica de enfileirar caso falte espaco mesmo durante a reversao
+        if (!sucesso) {
+            filaPendentes.enfileirar(idProcesso, tamanhoSolicitado);
+        }
+
+        return sucesso;
+    }
+
+
+    // executa a liberacao, o merge e tenta atender a fila, mas omite o registro no historico.
+    // essencial para que o ato de desfazer uma alocacao nao seja interpretado
+    // pelo sistema como uma nova liberacao feita pelo usuario.
+    private boolean liberarSilencioso(String idProcesso) {
+        NoArvore noParaLiberar = buscarNoPorId(raiz, idProcesso);
+        if (noParaLiberar == null) {
+            return false;
+        }
+
+        // devolve o bloco para a memoria e tira o dono
+        noParaLiberar.setEstado(NoArvore.Estado.LIVRE);
+        noParaLiberar.setId(null);
+
+        // tenta reagrupar os pedacos que ficaram livres para evitar fragmentacao
+        realizarMerge(noParaLiberar);
+
+        // ao liberar espaco, varre a fila de pendentes para tentar alocar quem estava esperando
+        int qtdNaFila = filaPendentes.tamanho();
+        for (int i = 0; i < qtdNaFila; i++) {
+            estruturas.NoFila.No req = filaPendentes.desenfileirar();
+            if (req != null) {
+                // usa o metodo silencioso para que as tentativas da fila nao criem falso historico
+                alocarSilencioso(req.id, req.tamanho);
+            }
+        }
+        return true;
     }
 
     public NoLista[] getListasLivres() {
