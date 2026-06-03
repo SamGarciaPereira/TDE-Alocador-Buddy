@@ -63,6 +63,7 @@ ALOCAR modelo3d 8192
 
 # Fase 11: Liberações em sequência para testar merge total
 LIBERAR img01
+LIBERAR img02
 LIBERAR icone01
 LIBERAR icone02
 LIBERAR icone03
