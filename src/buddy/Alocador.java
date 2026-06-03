@@ -269,16 +269,6 @@ Alocador {
 
         // tenta reagrupar os pedacos que ficaram livres para evitar fragmentacao
         realizarMerge(noParaLiberar);
-
-        // ao liberar espaco, varre a fila de pendentes para tentar alocar quem estava esperando
-        int qtdNaFila = filaPendentes.tamanho();
-        for (int i = 0; i < qtdNaFila; i++) {
-            estruturas.NoFila.No req = filaPendentes.desenfileirar();
-            if (req != null) {
-                // usa o metodo silencioso para que as tentativas da fila nao criem falso historico
-                alocarSilencioso(req.id, req.tamanho);
-            }
-        }
         return true;
     }
 
