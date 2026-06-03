@@ -73,6 +73,16 @@ public class Main {
 
                     break;
 
+                case 3:
+                    boolean desfez = alocador.desfazer();
+
+                    if (desfez) {
+                        System.out.println("Última operação desfeita com sucesso!");
+                    } else {
+                        System.out.println("Histórico vazio ou não foi possível desfazer.");
+                    }
+                    break;
+
                 case 4:
 
                     ArvorePrinter.imprimir(
@@ -89,6 +99,10 @@ public class Main {
 
                     break;
 
+                case 6:
+                    BuddyInfoPrinter.imprimir(alocador);
+                    break;
+
                 case 7:
 
                     DatasetProcessor.carregar(
@@ -97,8 +111,6 @@ public class Main {
                     );
 
                     break;
-
-
 
                 case 8:
 
